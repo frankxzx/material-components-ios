@@ -167,6 +167,11 @@ static const NSTimeInterval kSelectionAnimationDuration = 0.3;
   [self updateDisplayedImage];
 }
 
+- (void)setSelectedImage:(UIImage *)selectedImage:(nullable UIImage *)image {
+    _selectedImage = image;
+    [self updateDisplayedImage];
+}
+
 - (void)setBadgeValue:(nullable NSString *)badgeValue {
   _badgeValue = [badgeValue copy];
   _badgeLabel.text = badgeValue;
@@ -218,6 +223,7 @@ static const NSTimeInterval kSelectionAnimationDuration = 0.3;
                  count:(NSInteger)itemCount {
   self.title = item.title;
   self.image = item.image;
+  self.selectedImage = item.selectedImage;
   self.badgeValue = item.badgeValue;
   self.accessibilityIdentifier = item.accessibilityIdentifier;
 
@@ -487,6 +493,9 @@ static const NSTimeInterval kSelectionAnimationDuration = 0.3;
   UIColor *imageTintColor = _style.imageTintColor;
   if (self.isHighlighted || self.isSelected) {
     imageTintColor = _style.selectedImageTintColor;
+    _imageView.image = _selectedImage;
+  } else {
+    _imageView.image = _image;
   }
   _imageView.tintColor = imageTintColor;
 }
@@ -578,7 +587,11 @@ static const NSTimeInterval kSelectionAnimationDuration = 0.3;
 }
 
 - (void)updateDisplayedImage {
-  _imageView.image = _image;
+    if (self.isHighlighted || self.isSelected) {
+        _imageView.image = _selectedImage;
+    } else {
+        _imageView.image = _image;
+    }
 }
 
 - (void)updateDisplayedTitle {
