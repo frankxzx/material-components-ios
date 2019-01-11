@@ -20,3 +20,4 @@
 #import "MDCTabBarItemAppearance.h"
 #import "MDCTabBarUnderlineIndicatorTemplate.h"
 #import "MDCTabBarViewController.h"
+#import "MDCTabBarPageViewController.h"

@@ -112,7 +112,7 @@
   self.scrollView = [[UIScrollView alloc] initWithFrame:CGRectZero];
   self.scrollView.translatesAutoresizingMaskIntoConstraints = NO;
   self.scrollView.pagingEnabled = YES;
-  self.scrollView.scrollEnabled = NO;
+  self.scrollView.scrollEnabled = YES;
   [self.view addSubview:self.scrollView];
 
   NSDictionary *viewsScrollView =

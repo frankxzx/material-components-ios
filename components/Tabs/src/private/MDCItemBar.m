@@ -114,8 +114,8 @@ static void *kItemPropertyContext = &kItemPropertyContext;
   collectionView.showsVerticalScrollIndicator = NO;
 
   if (@available(iOS 11.0, *)) {
-    collectionView.contentInsetAdjustmentBehavior =
-        UIScrollViewContentInsetAdjustmentScrollableAxes;
+//      collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentScrollableAxes;
+      collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
   }
 
   collectionView.dataSource = self;

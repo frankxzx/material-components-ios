@@ -167,8 +167,8 @@ static const NSTimeInterval kSelectionAnimationDuration = 0.3;
   [self updateDisplayedImage];
 }
 
-- (void)setSelectedImage:(UIImage *)selectedImage:(nullable UIImage *)image {
-    _selectedImage = image;
+- (void)setSelectedImage:(UIImage *)selectedImage {
+    _selectedImage = selectedImage;
     [self updateDisplayedImage];
 }
 

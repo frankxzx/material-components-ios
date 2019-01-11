@@ -25,7 +25,7 @@
 
 typedef void (^MDCButtonActionBlock)(void);
 
-@interface TabBarViewControllerExample : MDCTabBarViewController
+@interface TabBarViewControllerExample : MDCTabBarPageViewController
 @property(nonatomic, strong, nullable) MDCSemanticColorScheme *colorScheme;
 @property(nonatomic, strong, nullable) MDCTypographyScheme *typographyScheme;
 @end

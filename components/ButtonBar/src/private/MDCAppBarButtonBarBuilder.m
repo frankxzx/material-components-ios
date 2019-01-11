@@ -226,7 +226,7 @@ static const UIEdgeInsets kButtonInset = {0, 12, 0, 12};
       }
     }
   } else {
-    NSAssert(0, @"No button title or image");
+//    NSAssert(0, @"No button title or image");
   }
 
   return contentInsets;

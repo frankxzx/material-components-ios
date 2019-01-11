@@ -88,6 +88,7 @@ target "MDCDragons" do
   pod 'MaterialComponentsBeta', :path => '../'
   pod 'MaterialComponentsExamples', :path => '../'
   pod 'MaterialComponentsSnapshotTests', :path => '../'
+  pod 'QMUIKit'
   use_frameworks!
 end
 
