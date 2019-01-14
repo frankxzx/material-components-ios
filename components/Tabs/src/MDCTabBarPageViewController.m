@@ -14,7 +14,7 @@
 
 #import "MDCTabBarPageViewController.h"
 
-@interface MDCTabBarPageViewController () <UIScrollViewDelegate>
+@interface MDCTabBarPageViewController () <UIScrollViewDelegate, UIGestureRecognizerDelegate>
 
 @property (nonatomic, readwrite, nonnull) MDCTabBar *tabBar;
 @property (nonatomic, strong) UIScrollView *contentView;
@@ -73,7 +73,7 @@
     self.tabBarPosition = UIBarPositionTop;
     self.automaticallyAdjustsScrollViewInsets = NO;
 
-    [self tz_addPopGestureToView:self.view];
+//    [self tz_addPopGestureToView:self.view];
 }
 
 - (void)viewDidLoad
@@ -400,87 +400,8 @@
     return _selectedViewController;
 }
 
-#pragma mark - UIGestureRecognizerDelegate
-
-- (BOOL)gestureRecognizerShouldBegin:(UIPanGestureRecognizer *)gestureRecognizer
-{
-    if ([[self valueForKey:@"_isTransitioning"] boolValue]) {
-        return NO;
-    }
-    if ([self.navigationController.transitionCoordinator isAnimated]) {
-        return NO;
-    }
-    if (self.childViewControllers.count <= 1) {
-        return NO;
-    }
-    if (self.tz_interactivePopDisabled) {
-        return NO;
-    }
-    // 侧滑手势触发位置
-    CGPoint location = [gestureRecognizer locationInView:self.view];
-    CGPoint offSet = [gestureRecognizer translationInView:gestureRecognizer.view];
-    BOOL ret = (0 < offSet.x && location.x <= 40);
-    return ret;
-}
-
-/// 只有当系统侧滑手势失败了，才去触发ScrollView的滑动
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer
-    shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
-{
+-(BOOL)forceEnableInteractivePopGestureRecognizer {
     return YES;
 }
 
 @end
-
-@interface UIViewController (TZPopGesturePrivate)
-@property (nonatomic, strong, readonly) UIPanGestureRecognizer *tz_popGestureRecognizer;
-@end
-
-@implementation UIViewController (TZPopGesture)
-
-- (void)tz_addPopGestureToView:(UIView *)view
-{
-    if (!view)
-        return;
-    if (!self.navigationController) {
-        // 在控制器转场的时候，self.navigationController可能是nil,这里用GCD和递归来处理这种情况
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)),
-            dispatch_get_main_queue(), ^{ [self tz_addPopGestureToView:view]; });
-    } else {
-        UIPanGestureRecognizer *pan = self.tz_popGestureRecognizer;
-        if (![view.gestureRecognizers containsObject:pan]) {
-            [view addGestureRecognizer:pan];
-        }
-    }
-}
-
-- (UIPanGestureRecognizer *)tz_popGestureRecognizer
-{
-    UIPanGestureRecognizer *pan = objc_getAssociatedObject(self, _cmd);
-    if (!pan) {
-        // 侧滑返回手势 手势触发的时候，让target执行action
-        id target = self.navigationController;
-        SEL action = NSSelectorFromString(@"handleInteractivePopGestureRecognizer:");
-        pan = [[UIPanGestureRecognizer alloc] initWithTarget:target action:action];
-        pan.maximumNumberOfTouches = 1;
-        if ([self conformsToProtocol:@protocol(UIGestureRecognizerDelegate)]) {
-            pan.delegate = (id <UIGestureRecognizerDelegate>) self;
-        }
-        //        self.navigationController.interactivePopGestureRecognizer.enabled = NO;
-        objc_setAssociatedObject(self, _cmd, pan, OBJC_ASSOCIATION_ASSIGN);
-    }
-    return pan;
-}
-
-- (BOOL)tz_interactivePopDisabled
-{
-    return [objc_getAssociatedObject(self, _cmd) boolValue];
-}
-
-- (void)setTz_interactivePopDisabled:(BOOL)disabled
-{
-    objc_setAssociatedObject(self, @selector(tz_interactivePopDisabled), @(disabled), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-@end
-

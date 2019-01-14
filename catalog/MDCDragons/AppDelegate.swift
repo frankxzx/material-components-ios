@@ -39,7 +39,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     } else {
       rootNodeViewController = MDCDragonsController(node: tree)
     }
-    let navigationController = QMUINavigationController(rootViewController: rootNodeViewController)
+    let navigationController = UINavigationController(rootViewController: rootNodeViewController)
 //    navigationController.interactivePopGestureRecognizer?.delegate = navigationController
     
     self.window?.rootViewController = navigationController
