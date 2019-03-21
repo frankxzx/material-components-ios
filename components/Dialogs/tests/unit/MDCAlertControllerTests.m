@@ -74,10 +74,10 @@
 
   // Then
   MDCAlertControllerView *view = (MDCAlertControllerView *)self.alert.view;
-  XCTAssertEqual(view.titleLabel.font, testFont);
-  XCTAssertEqual(view.messageLabel.font, testFont);
+  XCTAssertEqualObjects(view.titleLabel.font, testFont);
+  XCTAssertEqualObjects(view.messageLabel.font, testFont);
   for (UIButton *button in view.actionManager.buttonsInActionOrder) {
-    XCTAssertEqual(button.titleLabel.font, testFont);
+    XCTAssertEqualObjects(button.titleLabel.font, testFont);
   }
 }
 
@@ -295,6 +295,22 @@
   // Then
   MDCDialogShadowedView *shadowView = self.alert.mdc_dialogPresentationController.trackingView;
   XCTAssertEqual(shadowView.elevation, elevation);
+}
+
+- (void)testDialogBackgroundColorIsNotClearWhenNoThemingIsApllied {
+  // Then
+  XCTAssertNotNil(self.alert.view.backgroundColor);
+}
+
+- (void)testDialogCustomBackgroundColorAfterPresentation {
+  // Given
+  UIColor *testColor = UIColor.redColor;
+
+  // When
+  [self.alert setBackgroundColor:testColor];
+
+  // Then
+  XCTAssertEqualObjects(self.alert.view.backgroundColor, testColor);
 }
 
 @end

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 #import <XCTest/XCTest.h>
-#import "MDCAbstractTextFieldSnapshotTests.h"
+#import "supplemental/MDCAbstractTextFieldSnapshotTests.h"
 
 @interface MDCAbstractTextFieldSnapshotTests (Testing)
 - (BOOL)shouldTestExecute;
@@ -72,7 +72,7 @@
   return YES;
 }
 
-- (void)beforeGenerateSnapshotAndVerify {
+- (void)willGenerateSnapshotAndVerify {
   XCTAssertTrue(NO, @"This method should not be called.");
 }
 
@@ -88,13 +88,13 @@
  */
 @interface MDCAbstractTextFieldSnapshotTestsHookingFake
     : MDCAbstractTextFieldSnapshotTestsFake <MDCTextFieldSnapshotTestCaseHooking>
-@property(nonatomic, assign) BOOL beforeGenerateSnapshotAndVerifyCalled;
+@property(nonatomic, assign) BOOL willGenerateSnapshotAndVerifyCalled;
 @end
 
 @implementation MDCAbstractTextFieldSnapshotTestsHookingFake
 
-- (void)beforeGenerateSnapshotAndVerify {
-  self.beforeGenerateSnapshotAndVerifyCalled = YES;
+- (void)willGenerateSnapshotAndVerify {
+  self.willGenerateSnapshotAndVerifyCalled = YES;
 }
 
 @end
@@ -114,7 +114,9 @@
   [super setUp];
 
   self.fakeTest = [[MDCAbstractTextFieldSnapshotTestsFake alloc] init];
+  self.fakeTest.shouldExecuteEmptyTests = YES;
   self.hookingFakeTest = [[MDCAbstractTextFieldSnapshotTestsHookingFake alloc] init];
+  self.hookingFakeTest.shouldExecuteEmptyTests = YES;
 }
 
 - (void)tearDown {
@@ -134,7 +136,22 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
+}
+
+- (void)testTestTextFieldEmptyShouldNotExecute {
+  // Given
+  self.fakeTest.shouldExecuteEmptyTests = NO;
+  self.hookingFakeTest.shouldExecuteEmptyTests = NO;
+
+  // When
+  [self.fakeTest testTextFieldEmpty];
+  [self.hookingFakeTest testTextFieldEmpty];
+
+  // Then
+  XCTAssertFalse(self.fakeTest.generateSnapshotAndVerifyCalled);
+  XCTAssertFalse(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
+  XCTAssertFalse(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldEmptyIsEditing {
@@ -145,7 +162,22 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
+}
+
+- (void)testTestTextFieldEmptyShouldNotExecuteIsEditing {
+  // Given
+  self.fakeTest.shouldExecuteEmptyTests = NO;
+  self.hookingFakeTest.shouldExecuteEmptyTests = NO;
+
+  // When
+  [self.fakeTest testTextFieldEmptyIsEditing];
+  [self.hookingFakeTest testTextFieldEmptyIsEditing];
+
+  // Then
+  XCTAssertFalse(self.fakeTest.generateSnapshotAndVerifyCalled);
+  XCTAssertFalse(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
+  XCTAssertFalse(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldEmptyDisabled {
@@ -156,7 +188,22 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
+}
+
+- (void)testTestTextFieldEmptyShouldNotExecuteDisabled {
+  // Given
+  self.fakeTest.shouldExecuteEmptyTests = NO;
+  self.hookingFakeTest.shouldExecuteEmptyTests = NO;
+
+  // When
+  [self.fakeTest testTextFieldEmptyDisabled];
+  [self.hookingFakeTest testTextFieldEmptyDisabled];
+
+  // Then
+  XCTAssertFalse(self.fakeTest.generateSnapshotAndVerifyCalled);
+  XCTAssertFalse(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
+  XCTAssertFalse(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortPlaceholderText {
@@ -167,7 +214,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortPlaceholderTextIsEditing {
@@ -178,7 +225,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortPlaceholderTextDisabled {
@@ -189,7 +236,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongPlaceholderText {
@@ -200,7 +247,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongPlaceholderTextIsEditing {
@@ -211,7 +258,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongPlaceholderTextDisabled {
@@ -222,7 +269,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortHelperText {
@@ -233,7 +280,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortHelperTextIsEditing {
@@ -244,7 +291,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortHelperTextDisabled {
@@ -255,7 +302,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongHelperText {
@@ -266,7 +313,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongHelperTextIsEditing {
@@ -277,7 +324,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongHelperTextDisabled {
@@ -288,7 +335,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortErrorText {
@@ -299,7 +346,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortErrorTextIsEditing {
@@ -310,7 +357,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortErrorTextDisabled {
@@ -321,7 +368,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongErrorText {
@@ -332,7 +379,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongErrorTextIsEditing {
@@ -343,7 +390,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongErrorTextDisabled {
@@ -354,7 +401,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortInputText {
@@ -365,7 +412,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortInputTextIsEditing {
@@ -376,7 +423,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortInputTextDisabled {
@@ -387,7 +434,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongInputText {
@@ -398,7 +445,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongInputTextIsEditing {
@@ -409,7 +456,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongInputTextDisabled {
@@ -420,7 +467,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortInputPlaceholderHelperTexts {
@@ -431,7 +478,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortInputPlaceholderHelperTextsIsEditing {
@@ -442,7 +489,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortInputPlaceholderHelperTextsDisabled {
@@ -453,7 +500,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongInputPlaceholderHelperTexts {
@@ -464,7 +511,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongInputPlaceholderHelperTextsIsEditing {
@@ -475,7 +522,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongInputPlaceholderHelperTextsDisabled {
@@ -486,7 +533,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortInputPlaceholderErrorTexts {
@@ -497,7 +544,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortInputPlaceholderErrorTextsIsEditing {
@@ -508,7 +555,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithShortInputPlaceholderErrorTextsDisabled {
@@ -519,7 +566,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongInputPlaceholderErrorTexts {
@@ -530,7 +577,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongInputPlaceholderErrorTextsIsEditing {
@@ -541,7 +588,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 - (void)testTestTextFieldWithLongInputPlaceholderErrorTextsDisabled {
@@ -552,7 +599,7 @@
   // Then
   XCTAssertTrue(self.fakeTest.generateSnapshotAndVerifyCalled);
   XCTAssertTrue(self.hookingFakeTest.generateSnapshotAndVerifyCalled);
-  XCTAssertTrue(self.hookingFakeTest.beforeGenerateSnapshotAndVerifyCalled);
+  XCTAssertTrue(self.hookingFakeTest.willGenerateSnapshotAndVerifyCalled);
 }
 
 @end

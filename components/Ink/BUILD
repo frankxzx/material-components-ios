@@ -14,9 +14,12 @@
 
 load(
     "//:material_components_ios.bzl",
+    "mdc_examples_objc_library",
     "mdc_extension_objc_library",
     "mdc_objc_library",
     "mdc_public_objc_library",
+    "mdc_snapshot_objc_library",
+    "mdc_snapshot_test",
     "mdc_unit_test_suite",
 )
 
@@ -50,6 +53,15 @@ mdc_objc_library(
     deps = [":Ink"],
 )
 
+mdc_examples_objc_library(
+    name = "ObjcExamples",
+    deps = [
+        ":Ink",
+        "//components/Palettes",
+        "//components/Typography",
+    ],
+)
+
 mdc_objc_library(
     name = "unit_test_sources",
     testonly = 1,
@@ -71,5 +83,19 @@ mdc_unit_test_suite(
     name = "unit_tests",
     deps = [
         ":unit_test_sources",
+    ],
+)
+
+mdc_snapshot_objc_library(
+    name = "snapshot_test_lib",
+    deps = [
+        ":Ink",
+    ],
+)
+
+mdc_snapshot_test(
+    name = "snapshot_tests",
+    deps = [
+        ":snapshot_test_lib",
     ],
 )

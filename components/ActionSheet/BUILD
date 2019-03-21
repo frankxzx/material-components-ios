@@ -15,9 +15,13 @@
 
 load(
     "//:material_components_ios.bzl",
+    "mdc_examples_objc_library",
+    "mdc_examples_swift_library",
     "mdc_extension_objc_library",
     "mdc_objc_library",
     "mdc_public_objc_library",
+    "mdc_snapshot_objc_library",
+    "mdc_snapshot_test",
     "mdc_unit_test_suite",
 )
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
@@ -38,8 +42,6 @@ mdc_extension_objc_library(
     name = "Theming",
     deps = [
         ":ActionSheet",
-        ":ColorThemer",
-        ":TypographyThemer",
         "//components/schemes/Container",
     ],
 )
@@ -82,38 +84,46 @@ mdc_objc_library(
     includes = ["src/private"],
 )
 
-mdc_objc_library(
+mdc_examples_objc_library(
     name = "ObjcExamples",
-    srcs = glob([
-        "examples/*.m",
-        "examples/*.h",
-        "examples/supplemental/*.m",
-        "examples/supplemental/*.h",
-    ]),
     deps = [
         ":ActionSheet",
         ":Theming",
-        "//components/Buttons:ButtonThemer",
+        "//components/Buttons",
+        "//components/Buttons:Theming",
         "//components/schemes/Color",
+        "//components/schemes/Container",
         "//components/schemes/Typography",
     ],
 )
 
-swift_library(
+mdc_examples_swift_library(
     name = "SwiftExamples",
-    srcs = glob([
-        "examples/*.swift",
-        "examples/supplemental/*.swift",
-    ]),
     deps = [
         ":ActionSheet",
         ":Theming",
+        "//components/schemes/Color",
+        "//components/schemes/Container",
+        "//components/schemes/Typography",
     ],
 )
 
 swift_library(
     name = "unit_test_swift_sources",
     srcs = glob(["tests/unit/*.swift"]),
+    copts = [
+        "-swift-version",
+        "3",
+    ],
+    deps = [
+        ":ActionSheet",
+        ":private",
+    ],
+)
+
+swift_library(
+    name = "unit_test_color_themer_swift_sources",
+    srcs = glob(["tests/unit/ColorThemer/*.swift"]),
     copts = [
         "-swift-version",
         "3",
@@ -128,10 +138,8 @@ swift_library(
 mdc_objc_library(
     name = "unit_test_sources",
     testonly = 1,
-    srcs = native.glob([
-        "tests/unit/*.m",
-        "tests/unit/*.h",
-    ]),
+    srcs = native.glob(["tests/unit/*.m"]),
+    hdrs = native.glob(["tests/unit/*.h"]),
     sdk_frameworks = [
         "UIKit",
         "CoreImage",
@@ -147,10 +155,64 @@ mdc_objc_library(
     ],
 )
 
+mdc_objc_library(
+    name = "unit_test_theming_sources",
+    testonly = 1,
+    srcs = native.glob([
+        "tests/unit/Theming/*.m",
+    ]),
+    sdk_frameworks = [
+        "UIKit",
+        "CoreImage",
+        "XCTest",
+    ],
+    deps = [
+        ":ActionSheet",
+        ":Theming",
+        ":privateHeaders",
+        ":unit_test_sources",
+    ],
+)
+
+mdc_objc_library(
+    name = "unit_test_themer_sources",
+    testonly = 1,
+    srcs = native.glob([
+        "tests/unit/ActionSheetThemer/*.m",
+    ]),
+    sdk_frameworks = [
+        "UIKit",
+        "CoreImage",
+        "XCTest",
+    ],
+    deps = [
+        ":ActionSheet",
+        ":ActionSheetThemer",
+        ":ColorThemer",
+        ":TypographyThemer",
+        ":privateHeaders",
+        ":unit_test_sources",
+    ],
+)
+
 mdc_unit_test_suite(
     name = "unit_tests",
     deps = [
         ":unit_test_sources",
         ":unit_test_swift_sources",
+    ],
+)
+
+mdc_snapshot_objc_library(
+    name = "snapshot_test_lib",
+    deps = [
+        ":ActionSheet",
+    ],
+)
+
+mdc_snapshot_test(
+    name = "snapshot_tests",
+    deps = [
+        ":snapshot_test_lib",
     ],
 )

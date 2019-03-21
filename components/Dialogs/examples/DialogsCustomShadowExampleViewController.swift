@@ -12,21 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Foundation
+import UIKit
+
 import MaterialComponents.MaterialButtons
 import MaterialComponents.MaterialDialogs
+import MaterialComponentsBeta.MaterialButtons_Theming
+import MaterialComponentsBeta.MaterialContainerScheme
+import MaterialComponentsBeta.MaterialDialogs_Theming
 
 class CustomShadowViewController: UIViewController {
 
   let bodyLabel = UILabel()
 
-  let dismissButton = MDCFlatButton()
-
   override func viewDidLoad() {
 
     super.viewDidLoad()
     view.backgroundColor = UIColor.white
-    view.layer.cornerRadius = 32.0
+
+    // Setting the corner radius of the view's layer will propagate to the shadow
+    // layer when the view is presented by MDCDailogPresentationController.
+    // Note that setting the corner radius in viewDidLoad is not recommended, since it
+    // will be overriden if callers apply a themer to the MDCDailogPresentationController instance.
+    self.view.layer.cornerRadius = 32.0
 
     bodyLabel.text =
       "This presented view has a corner radius so we've set the corner radius on the presentation controller."
@@ -54,30 +61,32 @@ class CustomShadowViewController: UIViewController {
 
 class DialogsCustomShadowExampleViewController: UIViewController {
 
-  let flatButton = MDCFlatButton()
+  let textButton = MDCButton()
   let transitionController = MDCDialogTransitionController()
+  var containerScheme: MDCContainerScheming = MDCContainerScheme()
 
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    view.backgroundColor = UIColor.white
+    view.backgroundColor = containerScheme.colorScheme.backgroundColor
 
-    flatButton.setTitle("PRESENT ALERT", for: UIControlState())
-    flatButton.setTitleColor(UIColor(white: 0.1, alpha:1), for: UIControlState())
-    flatButton.sizeToFit()
-    flatButton.translatesAutoresizingMaskIntoConstraints = false
-    flatButton.addTarget(self, action: #selector(tap), for: .touchUpInside)
-    self.view.addSubview(flatButton)
+    textButton.setTitle("PRESENT ALERT", for: UIControlState())
+    textButton.setTitleColor(UIColor(white: 0.1, alpha:1), for: UIControlState())
+    textButton.sizeToFit()
+    textButton.translatesAutoresizingMaskIntoConstraints = false
+    textButton.addTarget(self, action: #selector(tap), for: .touchUpInside)
+    textButton.applyTextTheme(withScheme: containerScheme)
+    self.view.addSubview(textButton)
 
     NSLayoutConstraint.activate([
-      NSLayoutConstraint(item:flatButton,
+      NSLayoutConstraint(item:textButton,
                        attribute:.centerX,
                        relatedBy:.equal,
                        toItem:self.view,
                        attribute:.centerX,
                        multiplier:1.0,
                        constant: 0.0),
-      NSLayoutConstraint(item:flatButton,
+      NSLayoutConstraint(item:textButton,
                        attribute:.centerY,
                        relatedBy:.equal,
                        toItem:self.view,
@@ -89,16 +98,16 @@ class DialogsCustomShadowExampleViewController: UIViewController {
 
   @objc func tap(_ sender: Any) {
     let presentedController = CustomShadowViewController(nibName: nil, bundle: nil)
+
+    // Using a MDCDialogTransitionController as the transition delegate also sets
+    // MDCDailogPresentationController as the presentation controller.
+    // Make sure to store a strong reference to the transitionController.
     presentedController.modalPresentationStyle = .custom;
     presentedController.transitioningDelegate = self.transitionController;
 
+    // Note this example demonstrate direct manipulation of cornerRadius on the
+    //  view's layer so we're intentionally not calling the presentation controller's themer.
     self.present(presentedController, animated: true, completion: nil)
-
-    // We set the corner radius to adjust the shadow that is implemented via the trackingView in the
-    // presentation controller.
-    if let presentationController = presentedController.mdc_dialogPresentationController {
-      presentationController.dialogCornerRadius = presentedController.view.layer.cornerRadius
-    }
   }
 
   // MARK: Catalog by convention

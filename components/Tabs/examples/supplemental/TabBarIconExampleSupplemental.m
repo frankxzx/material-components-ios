@@ -88,7 +88,7 @@
   self.appBarViewController.headerView.minimumHeight = 56 + 72;
 
   UIFont *font;
-  if ([UIFont respondsToSelector:@selector(monospacedDigitSystemFontOfSize:weight:)]) {
+  if (@available(iOS 9.0, *)) {
     font = [UIFont monospacedDigitSystemFontOfSize:14 weight:UIFontWeightRegular];
   } else {
     font = [UIFont systemFontOfSize:14];
@@ -266,11 +266,13 @@
 
 - (void)viewWillTransitionToSize:(CGSize)size
        withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-  [coordinator animateAlongsideTransition:
-      ^(__unused id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
-    // Update the scrollView position so that the selected view is entirely visible
-    [self tabBar:self.tabBar didSelectItem:self.tabBar.selectedItem];
-  } completion:nil];
+  [coordinator
+      animateAlongsideTransition:^(
+          __unused id<UIViewControllerTransitionCoordinatorContext> _Nonnull context) {
+        // Update the scrollView position so that the selected view is entirely visible
+        [self tabBar:self.tabBar didSelectItem:self.tabBar.selectedItem];
+      }
+                      completion:nil];
   [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
@@ -280,11 +282,11 @@
 
 + (NSDictionary *)catalogMetadata {
   return @{
-    @"breadcrumbs": @[ @"Tab Bar", @"Tabs with Icons" ],
-    @"description": @"Tabs organize content across different screens, data sets, and "
-    @"other interactions.",
-    @"primaryDemo": @YES,
-    @"presentable": @YES,
+    @"breadcrumbs" : @[ @"Tab Bar", @"Tabs with Icons" ],
+    @"description" : @"Tabs organize content across different screens, data sets, and "
+                     @"other interactions.",
+    @"primaryDemo" : @YES,
+    @"presentable" : @YES,
   };
 }
 

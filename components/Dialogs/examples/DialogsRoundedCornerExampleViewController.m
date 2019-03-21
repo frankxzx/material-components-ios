@@ -13,12 +13,19 @@
 // limitations under the License.
 
 #import "DialogsRoundedCornerExampleViewController.h"
+#import "MaterialButtons+Theming.h"
 #import "MaterialButtons.h"
+#import "MaterialDialogs+Theming.h"
 #import "MaterialDialogs.h"
+
+static const CGFloat kCornerRadiusThemed = 3;
+static const CGFloat kCornerRadiusUnthemed = 12;
 
 @interface DialogsRoundedCornerSimpleController : UIViewController
 
-@property(nonatomic, strong) MDCFlatButton *dismissButton;
+@property(nonatomic, strong) MDCButton *dismissButton;
+
+@property(nonatomic, strong) MDCContainerScheme *containerScheme;
 
 @end
 
@@ -27,19 +34,28 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
 
-  self.view.backgroundColor = [UIColor whiteColor];
+  if (self.containerScheme == nil) {
+    self.containerScheme = [[MDCContainerScheme alloc] init];
+  }
 
-  _dismissButton = [[MDCFlatButton alloc] initWithFrame:CGRectZero];
-  [_dismissButton setTitle:@"Dismiss" forState:UIControlStateNormal];
-  [_dismissButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-  _dismissButton.autoresizingMask =
+  if (self.containerScheme.colorScheme == nil) {
+    self.containerScheme.colorScheme =
+        [[MDCSemanticColorScheme alloc] initWithDefaults:MDCColorSchemeDefaultsMaterial201804];
+  }
+
+  self.dismissButton = [[MDCButton alloc] initWithFrame:CGRectZero];
+  [self.dismissButton setTitle:@"Dismiss" forState:UIControlStateNormal];
+  [self.dismissButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+  self.dismissButton.autoresizingMask =
       UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin |
       UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
-  [_dismissButton addTarget:self
-                     action:@selector(dismiss:)
-           forControlEvents:UIControlEventTouchUpInside];
+  [self.dismissButton addTarget:self
+                         action:@selector(dismiss:)
+               forControlEvents:UIControlEventTouchUpInside];
+  [self.view addSubview:self.dismissButton];
 
-  [self.view addSubview:_dismissButton];
+  [self.dismissButton applyTextThemeWithScheme:self.containerScheme];
+  self.view.backgroundColor = self.containerScheme.colorScheme.backgroundColor;
 }
 
 - (void)viewWillLayoutSubviews {
@@ -59,10 +75,10 @@
 
 @end
 
-@interface DialogsRoundedCornerExampleViewController ()
+@interface DialogsRoundedCornerExampleViewController () <MDCDialogPresentationControllerDelegate>
 
-@property(nonatomic, strong) MDCFlatButton *presentButton;
 @property(nonatomic, strong) MDCDialogTransitionController *transitionController;
+@property(nonatomic, strong) MDCContainerScheme *containerScheme;
 
 @end
 
@@ -71,47 +87,123 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
 
+  if (self.containerScheme == nil) {
+    self.containerScheme = [[MDCContainerScheme alloc] init];
+  }
+
+  if (self.containerScheme.colorScheme == nil) {
+    self.containerScheme.colorScheme =
+        [[MDCSemanticColorScheme alloc] initWithDefaults:MDCColorSchemeDefaultsMaterial201804];
+  }
+
   // We must create and store a strong reference to the transitionController.
   // A presented view controller will set this object as its transitioning delegate.
   self.transitionController = [[MDCDialogTransitionController alloc] init];
 
-  self.view.backgroundColor = [UIColor whiteColor];
+  MDCButton *presentButton = [[MDCButton alloc] initWithFrame:CGRectZero];
+  [presentButton setTitle:[NSString stringWithFormat:@"Themed -- override radius to: %.1f",
+                                                     kCornerRadiusThemed]
+                 forState:UIControlStateNormal];
+  [presentButton addTarget:self
+                    action:@selector(didTapPresentThemed:)
+          forControlEvents:UIControlEventTouchUpInside];
+  [self.view addSubview:presentButton];
 
-  _presentButton = [[MDCFlatButton alloc] initWithFrame:CGRectZero];
-  [_presentButton setTitle:@"Present" forState:UIControlStateNormal];
-  [_presentButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-  _presentButton.autoresizingMask =
-      UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin |
-      UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
-  [_presentButton addTarget:self
-                     action:@selector(didTapPresent:)
+  MDCButton *unthemedButton = [[MDCButton alloc] initWithFrame:CGRectZero];
+  [unthemedButton setTitle:[NSString stringWithFormat:@"Un-Themed -- override radius to: %.1f",
+                                                      kCornerRadiusUnthemed]
+                  forState:UIControlStateNormal];
+  [unthemedButton addTarget:self
+                     action:@selector(didTapPresentDefault:)
            forControlEvents:UIControlEventTouchUpInside];
+  [self.view addSubview:unthemedButton];
 
-  [self.view addSubview:_presentButton];
+  presentButton.translatesAutoresizingMaskIntoConstraints = NO;
+  unthemedButton.translatesAutoresizingMaskIntoConstraints = NO;
+
+  [self.view addConstraints:@[
+    [NSLayoutConstraint constraintWithItem:self.view
+                                 attribute:NSLayoutAttributeCenterX
+                                 relatedBy:NSLayoutRelationEqual
+                                    toItem:presentButton
+                                 attribute:NSLayoutAttributeCenterX
+                                multiplier:1
+                                  constant:0],
+    [NSLayoutConstraint constraintWithItem:self.view
+                                 attribute:NSLayoutAttributeCenterY
+                                 relatedBy:NSLayoutRelationEqual
+                                    toItem:presentButton
+                                 attribute:NSLayoutAttributeCenterY
+                                multiplier:(CGFloat)1.1
+                                  constant:0],
+    [NSLayoutConstraint constraintWithItem:self.view
+                                 attribute:NSLayoutAttributeCenterX
+                                 relatedBy:NSLayoutRelationEqual
+                                    toItem:unthemedButton
+                                 attribute:NSLayoutAttributeCenterX
+                                multiplier:1
+                                  constant:0],
+    [NSLayoutConstraint constraintWithItem:self.view
+                                 attribute:NSLayoutAttributeCenterY
+                                 relatedBy:NSLayoutRelationEqual
+                                    toItem:unthemedButton
+                                 attribute:NSLayoutAttributeCenterY
+                                multiplier:(CGFloat)0.9
+                                  constant:0],
+  ]];
+
+  self.view.backgroundColor = self.containerScheme.colorScheme.backgroundColor;
+  [presentButton applyTextThemeWithScheme:self.containerScheme];
+  [unthemedButton applyTextThemeWithScheme:self.containerScheme];
 }
 
-- (void)viewWillLayoutSubviews {
-  [super viewWillLayoutSubviews];
-  [_presentButton sizeToFit];
-  _presentButton.center =
-      CGPointMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds));
-}
-
-- (IBAction)didTapPresent:(id)sender {
+// Theming the presentation controller, and manually overriding
+// the default corner radius set by the themer,
+- (IBAction)didTapPresentThemed:(id)sender {
   DialogsRoundedCornerSimpleController *viewController =
       [[DialogsRoundedCornerSimpleController alloc] initWithNibName:nil bundle:nil];
 
+  // Make sure to store a strong reference to the transitionController.
   viewController.modalPresentationStyle = UIModalPresentationCustom;
   viewController.transitioningDelegate = self.transitionController;
+  viewController.containerScheme = self.containerScheme;
 
-  // sets the dialog's corner radius
-  viewController.view.layer.cornerRadius = 24;
-
-  // ensure shadow/tracking layer matches the dialog's corner radius
   MDCDialogPresentationController *controller = viewController.mdc_dialogPresentationController;
-  controller.dialogCornerRadius = viewController.view.layer.cornerRadius;
+  controller.dialogPresentationControllerDelegate = self;
 
-  [self presentViewController:viewController animated:YES completion:NULL];
+  // Apply a presentation theme, which, among other things, sets the dialog's corner radius to 4.
+  [controller applyThemeWithScheme:self.containerScheme];
+
+  // To override the corner radius set by the themer, update the presentation controller's radius.
+  // The following line will override the value set by the themer, setting 6.0 as the final value:
+  viewController.mdc_dialogPresentationController.dialogCornerRadius = kCornerRadiusThemed;
+
+  // Do not set the corner radius directly on the view if applying a presentation controller
+  // themer. This next line is ignored bcasue applyThemeWithScheme: takes precedence:
+  viewController.view.layer.cornerRadius = 24.0;  // AVOID!
+
+  [self presentViewController:viewController animated:YES completion:nil];
+}
+
+// NOT theming the presentation controller, while manually setting the corner radius
+- (IBAction)didTapPresentDefault:(id)sender {
+  DialogsRoundedCornerSimpleController *viewController =
+      [[DialogsRoundedCornerSimpleController alloc] initWithNibName:nil bundle:nil];
+
+  // Make sure to store a strong reference to the transitionController.
+  viewController.modalPresentationStyle = UIModalPresentationCustom;
+  viewController.transitioningDelegate = self.transitionController;
+  viewController.containerScheme = self.containerScheme;
+
+  // Setting the presented dialog's corner radius on an un-themed dialog is ok:
+  viewController.view.layer.cornerRadius = kCornerRadiusUnthemed;  // OK!
+
+  [self presentViewController:viewController animated:YES completion:nil];
+}
+
+- (void)dialogPresentationControllerDidDismiss:
+    (MDCDialogPresentationController *)dialogPresentationController {
+  NSLog(@"You just dismissed a dialog with rounded corners");
 }
 
 #pragma mark - CatalogByConvention

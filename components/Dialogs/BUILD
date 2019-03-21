@@ -15,9 +15,13 @@
 
 load(
     "//:material_components_ios.bzl",
+    "mdc_examples_objc_library",
+    "mdc_examples_swift_library",
     "mdc_extension_objc_library",
     "mdc_objc_library",
     "mdc_public_objc_library",
+    "mdc_snapshot_objc_library",
+    "mdc_snapshot_test",
     "mdc_unit_test_suite",
 )
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
@@ -99,6 +103,31 @@ mdc_extension_objc_library(
     ],
 )
 
+mdc_examples_objc_library(
+    name = "ObjcExamples",
+    deps = [
+        ":Dialogs",
+        ":Theming",
+        "//components/Buttons:ButtonThemer",
+        "//components/Collections",
+        "//components/schemes/Color",
+        "//components/schemes/Container",
+    ],
+)
+
+mdc_examples_swift_library(
+    name = "SwiftExamples",
+    deps = [
+        ":DialogThemer",
+        ":Dialogs",
+        ":Theming",
+        "//components/Collections",
+        "//components/List",
+        "//components/schemes/Color",
+        "//components/schemes/Container",
+    ],
+)
+
 mdc_objc_library(
     name = "private",
     hdrs = native.glob(["src/private/*.h"]),
@@ -127,9 +156,44 @@ mdc_objc_library(
     ],
 )
 
+swift_library(
+    name = "unit_test_swift_sources",
+    srcs = glob([
+        "tests/unit/*.swift",
+        "tests/unit/Theming/*.swift",
+    ]),
+    copts = [
+        "-swift-version",
+        "3",
+    ],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":DialogThemer",
+        ":Theming",
+        "//components/Buttons:Theming",
+    ],
+)
+
 mdc_unit_test_suite(
     name = "unit_tests",
     deps = [
         ":unit_test_sources",
+        ":unit_test_swift_sources",
     ],
+)
+
+mdc_snapshot_objc_library(
+    name = "snapshot_test_lib",
+    deps = [
+        ":Dialogs",
+        ":Theming",
+        "//components/schemes/Color",
+        "//components/schemes/Container",
+        "//components/schemes/Typography",
+    ],
+)
+
+mdc_snapshot_test(
+    name = "snapshot_tests",
+    deps = [":snapshot_test_lib"],
 )

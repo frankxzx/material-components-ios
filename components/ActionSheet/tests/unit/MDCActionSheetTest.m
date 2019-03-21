@@ -378,24 +378,24 @@ static const CGFloat kSafeAreaAmount = 20;
 
 - (void)testSetTitleFont {
   // Given
-  UIFont *titleFont = [UIFont preferredFontForTextStyle:UIFontTextStyleCallout];
+  UIFont *titleFont = [UIFont systemFontOfSize:23];
 
   // When
   self.actionSheet.titleFont = titleFont;
 
   // Then
-  XCTAssertEqual(self.actionSheet.header.titleLabel.font, titleFont);
+  XCTAssertEqualObjects(self.actionSheet.header.titleLabel.font, titleFont);
 }
 
 - (void)testSetMessageFont {
   // Given
-  UIFont *messageFont = [UIFont preferredFontForTextStyle:UIFontTextStyleCaption1];
+  UIFont *messageFont = [UIFont systemFontOfSize:23];
 
   // When
   self.actionSheet.messageFont = messageFont;
 
   // Then
-  XCTAssertEqual(self.actionSheet.header.messageLabel.font, messageFont);
+  XCTAssertEqualObjects(self.actionSheet.header.messageLabel.font, messageFont);
 }
 
 @end

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#import <CoreGraphics/CoreGraphics.h>
+#import <UIKit/UIKit.h>
 #import <XCTest/XCTest.h>
 
 #import "MDCTextFieldSnapshotTestCase.h"
@@ -25,7 +27,19 @@
   self.textField = [[SnapshotFakeMDCTextField alloc] init];
 }
 
+- (void)removeAllSubviewsFromSuperviews:(UIView *)view {
+  NSArray *subviews = [view.subviews copy];
+  for (UIView *subview in subviews) {
+    [self removeAllSubviewsFromSuperviews:subview];
+  }
+  [view removeFromSuperview];
+}
+
 - (void)tearDown {
+  // This is required to invalidate any pending UITextField caret blink timers.
+  // Calling `removeFromSuperview` on `self.textField` is insufficient.
+  // See https://github.com/material-components/material-components-ios/issues/6181
+  [self removeAllSubviewsFromSuperviews:self.textField];
   self.textField = nil;
 
   [super tearDown];
