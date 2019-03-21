@@ -72,8 +72,6 @@
     self.contentView = scrollView;
     self.tabBarPosition = UIBarPositionTop;
     self.automaticallyAdjustsScrollViewInsets = NO;
-
-//    [self tz_addPopGestureToView:self.view];
 }
 
 - (void)viewDidLoad
